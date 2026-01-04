@@ -7,7 +7,7 @@ import ThemeStep from '@/components/steps/ThemeStep';
 import PreviewStep from '@/components/steps/PreviewStep';
 import SuccessStep from '@/components/steps/SuccessStep';
 import { themes, ThemeKey } from '@/lib/themes';
-import { ContributionData, getContributionData } from '@/lib/github';
+import { ContributionData, getContributionData, getAvailableYears } from '@/lib/github';
 
 type Step = 'username' | 'theme' | 'preview' | 'success';
 
@@ -16,6 +16,8 @@ export default function Home() {
   const [username, setUsername] = useState('');
   const [selectedTheme, setSelectedTheme] = useState<ThemeKey>('dark');
   const [contributionData, setContributionData] = useState<ContributionData | null>(null);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [availableYears] = useState(getAvailableYears());
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUsernameSubmit = useCallback(async (name: string) => {
@@ -23,7 +25,7 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      const data = await getContributionData(name);
+      const data = await getContributionData(name, selectedYear);
       setContributionData(data);
       setStep('theme');
     } catch (error) {
@@ -31,12 +33,26 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [selectedYear]);
 
   const handleThemeSelect = useCallback((theme: ThemeKey) => {
     setSelectedTheme(theme);
     setStep('preview');
   }, []);
+
+  const handleYearChange = useCallback(async (year: number) => {
+    setSelectedYear(year);
+    setIsLoading(true);
+
+    try {
+      const data = await getContributionData(username, year);
+      setContributionData(data);
+    } catch (error) {
+      console.error('Error fetching contribution data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [username]);
 
   const handleComplete = useCallback(() => {
     setStep('success');
@@ -47,6 +63,7 @@ export default function Home() {
     setUsername('');
     setSelectedTheme('dark');
     setContributionData(null);
+    setSelectedYear(new Date().getFullYear());
   }, []);
 
   const handleBackToUsername = useCallback(() => {
@@ -61,8 +78,8 @@ export default function Home() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin" />
-          <p className="text-gray-500">Loading contribution data...</p>
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-green-500 rounded-full animate-spin" />
+          <p className="text-gray-500">Fetching contributions from GitHub...</p>
         </div>
       </div>
     );
@@ -87,6 +104,9 @@ export default function Home() {
             username={username}
             theme={themes[selectedTheme]}
             data={contributionData}
+            availableYears={availableYears}
+            selectedYear={selectedYear}
+            onYearChange={handleYearChange}
             onComplete={handleComplete}
             onBack={handleBackToTheme}
           />

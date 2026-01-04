@@ -41,10 +41,23 @@ export default function UsernameStep({ onContinue }: UsernameStepProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.5 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-semibold text-center text-gray-900 mb-12 max-w-3xl leading-tight"
+                className="text-4xl md:text-5xl lg:text-6xl font-semibold text-center text-gray-900 mb-4 max-w-3xl leading-tight"
             >
-                A new era of personal software is here.
+                Your GitHub story,
+                <br />
+                <span className="bg-linear-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent">
+                    in motion.
+                </span>
             </motion.h1>
+
+            <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.5 }}
+                className="text-gray-500 text-lg mb-10 text-center max-w-md"
+            >
+                Generate a beautiful timelapse video of your contribution chart
+            </motion.p>
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -62,7 +75,7 @@ export default function UsernameStep({ onContinue }: UsernameStepProps) {
                             setError('');
                         }}
                         onKeyDown={handleKeyDown}
-                        className="w-full px-6 py-4 rounded-full bg-white border-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),_0_2px_8px_rgba(0,0,0,0.04)] focus:shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),_0_4px_16px_rgba(0,0,0,0.08)] focus:outline-none transition-shadow duration-200 text-gray-900 placeholder-gray-400 text-lg"
+                        className="w-full px-6 py-4 rounded-full bg-white border-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),0_2px_8px_rgba(0,0,0,0.04)] focus:shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),0_4px_16px_rgba(0,0,0,0.08)] focus:outline-none transition-shadow duration-200 text-gray-900 placeholder-gray-400 text-lg"
                     />
                 </div>
                 <button
@@ -82,15 +95,6 @@ export default function UsernameStep({ onContinue }: UsernameStepProps) {
                     {error}
                 </motion.p>
             )}
-
-            <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
-                className="mt-8 text-gray-400 text-sm"
-            >
-                Generate a timelapse of your GitHub contributions
-            </motion.p>
         </motion.div>
     );
 }

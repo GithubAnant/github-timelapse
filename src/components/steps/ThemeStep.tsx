@@ -36,6 +36,41 @@ function MiniContributionGrid({ theme }: { theme: Theme }) {
     );
 }
 
+// Staggered card animation variants
+const cardVariants = {
+    hidden: { opacity: 0, y: 60, scale: 0.8, rotateX: 15 },
+    visible: (i: number) => ({
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        rotateX: 0,
+        transition: {
+            type: 'spring' as const,
+            stiffness: 100,
+            damping: 15,
+            delay: 0.2 + i * 0.15,
+        },
+    }),
+    hover: {
+        y: -12,
+        scale: 1.03,
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        transition: {
+            type: 'spring' as const,
+            stiffness: 400,
+            damping: 25,
+        },
+    },
+    tap: {
+        scale: 0.97,
+        transition: {
+            type: 'spring' as const,
+            stiffness: 400,
+            damping: 20,
+        },
+    },
+};
+
 export default function ThemeStep({ onSelect, onBack }: ThemeStepProps) {
     const themeEntries = Object.entries(themes) as [ThemeKey, Theme][];
 
@@ -64,42 +99,58 @@ export default function ThemeStep({ onSelect, onBack }: ThemeStepProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.5 }}
-                className="text-3xl md:text-4xl font-semibold text-center text-gray-900 mb-12"
+                className="text-3xl md:text-4xl font-semibold text-center text-gray-900 mb-4"
             >
                 Choose your theme
             </motion.h1>
 
-            <motion.div
+            <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.5 }}
+                className="text-gray-500 mb-12 text-center"
+            >
+                Pick the style that matches your vibe
+            </motion.p>
+
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="flex flex-col sm:flex-row gap-6"
+                className="flex flex-col sm:flex-row gap-8"
+                style={{ perspective: '1000px' }}
             >
                 {themeEntries.map(([key, theme], index) => (
                     <motion.button
                         key={key}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
+                        custom={index}
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                        whileHover="hover"
+                        whileTap="tap"
                         onClick={() => onSelect(key)}
-                        className="group p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] border-2 border-transparent hover:border-gray-200"
-                        style={{ backgroundColor: theme.background }}
+                        className="group p-8 rounded-2xl transition-colors duration-300 border-2 border-transparent hover:border-gray-200/50 shadow-xl"
+                        style={{
+                            backgroundColor: theme.background,
+                            transformStyle: 'preserve-3d',
+                        }}
                     >
-                        <div className="w-48">
+                        <div className="w-56">
                             <h3
-                                className="text-lg font-medium mb-4 text-left"
+                                className="text-lg font-medium mb-5 text-left"
                                 style={{ color: theme.text }}
                             >
                                 {theme.name}
                             </h3>
-                            <div className="p-3 rounded-lg" style={{ backgroundColor: theme.background }}>
+                            <div className="p-4 rounded-xl" style={{ backgroundColor: theme.background }}>
                                 <MiniContributionGrid theme={theme} />
                             </div>
-                            <div className="mt-4 flex items-center gap-1 justify-center">
+                            <div className="mt-5 flex items-center gap-1.5 justify-center">
                                 {theme.levels.map((color, i) => (
                                     <div
                                         key={i}
-                                        className="w-3 h-3 rounded-sm"
+                                        className="w-4 h-4 rounded-sm"
                                         style={{ backgroundColor: color }}
                                     />
                                 ))}
