@@ -20,14 +20,22 @@ export async function generateTimelapse(
   canvas.width = width;
   canvas.height = height;
 
-  // Count total days
+  // Calculate the index of the last day to animate to
   let totalDays = 0;
+  let currentIndex = 0;
+  const today = new Date();
+
   data.weeks.forEach((week) => {
     week.forEach((day) => {
+      currentIndex++;
       const dayDate = new Date(day.date);
-      const today = new Date();
-      if (dayDate <= today && dayDate.getFullYear() === data.year) {
-        totalDays++;
+      // We want to animate up to today (if in current year)
+      // or the end of the grid (if past year and we want to show full context)
+      // Checks:
+      // 1. If date is <= today, it's a candidate for being shown
+      // 2. We track the max index of such days
+      if (dayDate <= today) {
+        totalDays = currentIndex;
       }
     });
   });

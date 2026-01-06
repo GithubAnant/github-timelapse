@@ -8,8 +8,8 @@ const CELL_RADIUS = 3;
 const MONTH_LABEL_HEIGHT = 24;
 const DAY_LABEL_WIDTH = 36;
 const LEGEND_HEIGHT = 36;
-const PADDING = 24;
-const HEADER_HEIGHT = 28;
+const PADDING = 32; // Increased padding
+const HEADER_HEIGHT = 48; // Increased header height for better separation
 
 const MONTHS = [
   "Jan",
@@ -56,8 +56,8 @@ export function renderContributionChart(options: RenderOptions): void {
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
-  const gridStartX = DAY_LABEL_WIDTH + PADDING;
-  const gridStartY = HEADER_HEIGHT + MONTH_LABEL_HEIGHT + PADDING;
+  const gridStartX = DAY_LABEL_WIDTH + 10; // Shifted left significantly (was PADDING)
+  const gridStartY = HEADER_HEIGHT + MONTH_LABEL_HEIGHT + PADDING; // More vertical space
 
   // Calculate visible contributions
   let visibleCount = 0;
@@ -69,12 +69,28 @@ export function renderContributionChart(options: RenderOptions): void {
   ctx.textAlign = "left";
 
   let currentMonth = -1;
+  let lastLabelX = -100; // Track last label position to prevent overlap
+  const minLabelSpacing = 30; // Minimum pixels between labels
+
   data.weeks.forEach((week, weekIdx) => {
-    const monthOfFirstDay = new Date(week[0].date).getMonth();
+    const firstDayDate = new Date(week[0].date);
+    const monthOfFirstDay = firstDayDate.getMonth();
+    const yearOfFirstDay = firstDayDate.getFullYear();
+
+    // Skip labels from previous year (e.g., Dec when viewing 2026)
+    if (yearOfFirstDay < data.year) {
+      return;
+    }
+
     if (monthOfFirstDay !== currentMonth) {
       currentMonth = monthOfFirstDay;
       const x = gridStartX + weekIdx * (CELL_SIZE + CELL_GAP);
-      ctx.fillText(MONTHS[currentMonth], x, PADDING + 12);
+
+      // Only draw if there's enough spacing from the last label
+      if (x - lastLabelX >= minLabelSpacing) {
+        ctx.fillText(MONTHS[currentMonth], x, PADDING + 12);
+        lastLabelX = x;
+      }
     }
   });
 
@@ -85,7 +101,7 @@ export function renderContributionChart(options: RenderOptions): void {
 
   [1, 3, 5].forEach((dayIdx) => {
     const y = gridStartY + dayIdx * (CELL_SIZE + CELL_GAP) + CELL_SIZE / 2 + 4;
-    ctx.fillText(DAYS[dayIdx], DAY_LABEL_WIDTH + PADDING - 8, y);
+    ctx.fillText(DAYS[dayIdx], DAY_LABEL_WIDTH + 6, y); // Shifted left (was DAY_LABEL_WIDTH + PADDING - 8)
   });
 
   // Draw contribution grid
@@ -121,15 +137,15 @@ export function renderContributionChart(options: RenderOptions): void {
   ctx.textAlign = "left";
   ctx.fillText(
     `${count.toLocaleString()} contributions in ${data.year}`,
-    PADDING,
-    PADDING + 4
+    16, // Shifted left (was PADDING)
+    28 // Moved up (was PADDING + 4/10)
   );
 
-  // Draw @username on the right
+  // Draw @username on the right with extra padding to prevent cutoff
   ctx.textAlign = "right";
   ctx.fillStyle = theme.textMuted;
   ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-  ctx.fillText(`@${username}`, scaledWidth - PADDING, PADDING + 4);
+  ctx.fillText(`@${username}`, scaledWidth - 16, 28); // Moved up and adjusted right margin
 
   // Draw legend at bottom
   const scaledHeight = height / scale;

@@ -71,6 +71,19 @@ const cardVariants = {
     },
 };
 
+// Floating animation variants for continuous subtle movement
+const floatVariants = {
+    float: (i: number) => ({
+        y: [0, -8, 0],
+        transition: {
+            duration: 3,
+            ease: 'easeInOut' as const,
+            repeat: Infinity,
+            delay: i * 0.3,
+        },
+    }),
+};
+
 export default function ThemeStep({ onSelect, onBack }: ThemeStepProps) {
     const themeEntries = Object.entries(themes) as [ThemeKey, Theme][];
 
@@ -124,9 +137,9 @@ export default function ThemeStep({ onSelect, onBack }: ThemeStepProps) {
                     <motion.button
                         key={key}
                         custom={index}
-                        variants={cardVariants}
+                        variants={{ ...cardVariants, ...floatVariants }}
                         initial="hidden"
-                        animate="visible"
+                        animate={["visible", "float"]}
                         whileHover="hover"
                         whileTap="tap"
                         onClick={() => onSelect(key)}
